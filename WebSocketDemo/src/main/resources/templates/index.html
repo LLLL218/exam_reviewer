@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket Demo</title>
+</head>
+<body>
+<input id="text" type="text" placeholder="输入班级学号姓名" />
+<button onclick="send()">发送消息</button>
+<button onclick="closeWebSocket()">关闭连接</button>
+<div id="message">
+</div>
+</body>
+<script type="text/javascript">
+    var websocket = null;
+    // 你的班级学号姓名
+    var myInfo = "软件 2506 班 23852401 王致成";
+    var clientId = myInfo;
+
+    if('WebSocket' in window){
+        websocket = new WebSocket("ws://localhost:8080/ws/"+clientId);
+    }
+    else{
+        alert('Not support websocket')
+    }
+
+    websocket.onerror = function(){
+        setMessageInnerHTML("error");
+    };
+
+    websocket.onopen = function(){
+        setMessageInnerHTML("连接成功");
+    }
+
+    websocket.onmessage = function(event){
+        setMessageInnerHTML(event.data);
+    }
+
+    websocket.onclose = function(){
+        setMessageInnerHTML("close");
+    }
+
+    window.onbeforeunload = function(){
+        websocket.close();
+    }
+
+    function setMessageInnerHTML(innerHTML){
+        document.getElementById('message').innerHTML += innerHTML + '<br/>';
+    }
+
+    function send(){
+        var message = document.getElementById('text').value;
+        if(message && message.trim() !== ""){
+            websocket.send(message);
+            document.getElementById('text').value = "";
+        } else {
+            alert("请输入内容");
+        }
+    }
+
+    function closeWebSocket() {
+        websocket.close();
+    }
+</script>
+</html>
